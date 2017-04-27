@@ -1,46 +1,53 @@
-# akyuu-adapter-toshihiko
+# akyuu-adapter-statsd
 
-Toshihiko adapter for [Akyuujs](https://github.com/akyuujs/akyuu).
+StatsD adapter for [Akyuujs](https://github.com/akyuujs/akyuu).
 
-## Installation
-
+### Installation
 ```sh
-$ npm install --save -d akyuu-adapter-toshihiko
+$ npm install --save -d akyuu-adapter-statsd
 ```
 
-## Configuration
+### Configuration
+Make sure you have a `connections` section in your configuration file(s).  
+And its adapter should be `statsd`.
 
-Make sure you have a `connections` section in your configuration file(s).
+option | required | remark
+---- | ---- | ----
+adapter | ✓ | must be statsd
+host | ✓ | default 127.0.0.1
+port | ✓ | default 8125
+... | | [docs](https://www.npmjs.com/package/hot-shots)
 
-And its `adapter` should be `toshihiko`.
+### Usage
+#### Config File
+```
+// ${project}/config/default/connections.js
 
-| option | required | remark |
-|--------|----------|--------|
-| adapter| ✓        | must be `toshihiko` |
-| database | ✓      | database name |
-| username | ✓      | username of MySQL |
-| password | ✓     | passowrd of MySQL |
-| host |           | host of MySQL |
-| port |           | port of MySQL |
-| cache |          | same as [Toshihiko's document](https://github.com/XadillaX/Toshihiko#initialize) |
-| ... |            | same as [mysql's document](https://www.npmjs.com/package/mysql#pool-options) |
+'use strict'
 
-### A Probably Demo Configuration File
-
-**Filename:** ./config/default/connections.js
-
-```js
 module.exports = {
-    main: {
-        adapter: "toshihiko",
-        database: "test",
-        username: "root",
-        password: "",
-        host: "127.0.0.1",
-        port: 3306,
-
-        showSql: true,
-        charset: "utf8mb4_bin"
+    myStatsd: {
+        adapter: 'statsd',
+        host: '127.0.0.1',
+        port: 8125
     }
-};
+}
+```
+
+#### Usage File
+```
+// ${project}/${some}.js
+
+'use strict'
+
+const akyuu = require('akyuu');
+const myStatsd = akyuu.config.connection.get('myStatsd');
+
+myStatsd.socket.on('error', function(error) {
+    console.log(error);
+});
+
+
+statsd.increment('some_key');
+statsd.timing('some_key', 100);
 ```
